@@ -286,16 +286,16 @@
         </div>
         <div>
           <label class="veld-label">Hartslag (bpm)</label>
-          <input type="number" id="inp-hartslag" placeholder="bv. 72" min="30" max="220"/>
+          <input type="number" id="inp-hartslag" placeholder="bv. 72" min="30" max="220" step="1"/>
         </div>
         <div></div>
         <div>
           <label class="veld-label">Bovendruk (mmHg)</label>
-          <input type="number" id="inp-boven" placeholder="bv. 120" min="60" max="250"/>
+          <input type="number" id="inp-boven" placeholder="bv. 120" min="60" max="250" step="1"/>
         </div>
         <div>
           <label class="veld-label">Onderdruk (mmHg)</label>
-          <input type="number" id="inp-onder" placeholder="bv. 80" min="30" max="160"/>
+          <input type="number" id="inp-onder" placeholder="bv. 80" min="30" max="160" step="1"/>
         </div>
       </div>
       <div style="display:flex;gap:10px;margin-top:4px">
@@ -440,7 +440,10 @@ const MONTHS_NL  = ["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt",
 const DAGEN_NL   = ["zo","ma","di","wo","do","vr","za"];
 const DAGEN_LANG = ["zondag","maandag","dinsdag","woensdag","donderdag","vrijdag","zaterdag"];
 
-document.getElementById("inp-datum").value = new Date().toISOString().split("T")[0];
+document.getElementById("inp-datum").value    = new Date().toISOString().split("T")[0];
+document.getElementById("inp-hartslag").value = "60";
+document.getElementById("inp-boven").value    = "110";
+document.getElementById("inp-onder").value    = "70";
 tekenWeek();
 
 function herlaadUI() {
@@ -482,9 +485,9 @@ async function submitMeting() {
   document.getElementById("invoer-titel").textContent    = "➕ Nieuwe meting";
   document.getElementById("annuleer-knop").style.display = "none";
   document.getElementById("submit-knop").textContent     = "Opslaan";
-  document.getElementById("inp-hartslag").value = "";
-  document.getElementById("inp-boven").value    = "";
-  document.getElementById("inp-onder").value    = "";
+  document.getElementById("inp-hartslag").value = "60";
+  document.getElementById("inp-boven").value    = "110";
+  document.getElementById("inp-onder").value    = "70";
   const sm = document.getElementById("succes-melding");
   sm.style.display = "block";
   setTimeout(() => sm.style.display = "none", 2000);
@@ -642,8 +645,8 @@ function tekenWeekGrafieken(dagData) {
   weekGrafiekHs = new Chart(document.getElementById("grafiek-week-hs"),{
     type:"line",
     data:{ labels, datasets:[{ label:"Hartslag", data:dagData.map(d=>d.hs),
-      borderColor:"#e06060",backgroundColor:"rgba(224,96,96,0.1)",
-      tension:0.3,pointRadius:5,pointBackgroundColor:"#e06060",spanGaps:false }]},
+      borderColor:"#e06060",borderWidth:1.5,backgroundColor:"rgba(224,96,96,0.1)",
+      tension:0.3,pointRadius:4,pointBackgroundColor:"#e06060",spanGaps:false }]},
     options:{ responsive:true,plugins:{legend:{display:false},tooltip:tt},scales:schalen(50,120) }
   });
 
@@ -651,12 +654,12 @@ function tekenWeekGrafieken(dagData) {
   weekGrafiekBd = new Chart(document.getElementById("grafiek-week-bd"),{
     type:"line",
     data:{ labels, datasets:[
-      { label:"Bovendruk",data:dagData.map(d=>d.boven),borderColor:"#4a9eff",
-        backgroundColor:"rgba(74,158,255,0.1)",tension:0.3,pointRadius:5,
+      { label:"Bovendruk",data:dagData.map(d=>d.boven),borderWidth:1.5,borderColor:"#4a9eff",
+        backgroundColor:"rgba(74,158,255,0.1)",tension:0.3,pointRadius:4,
         pointBackgroundColor:"#4a9eff",spanGaps:false },
-      { label:"Onderdruk",data:dagData.map(d=>d.onder),borderColor:"#7bcfcf",
+      { label:"Onderdruk",data:dagData.map(d=>d.onder),borderWidth:1.5,borderColor:"#7bcfcf",
         backgroundColor:"rgba(123,207,207,0.1)",borderDash:[5,3],tension:0.3,
-        pointRadius:5,pointBackgroundColor:"#7bcfcf",spanGaps:false }
+        pointRadius:4,pointBackgroundColor:"#7bcfcf",spanGaps:false }
     ]},
     options:{ responsive:true,
       plugins:{ legend:{display:true,labels:{color:"#5a7da0",font:{size:12}}},tooltip:tt },
@@ -705,7 +708,7 @@ function tekenGrafieken() {
     type:"line",
     data:{ labels,datasets:[{ label:"Hartslag",data:data.map(m=>m.hartslag),
       borderColor:"#e06060",backgroundColor:"rgba(224,96,96,0.08)",
-      tension:0.3,pointRadius:3,pointBackgroundColor:"#e06060" }]},
+      tension:0.3,pointRadius:2.5,pointBackgroundColor:"#e06060" }]},
     options:{ responsive:true,plugins:{legend:{display:false},tooltip:tt},scales:sc(50,120) }
   });
 
@@ -713,10 +716,10 @@ function tekenGrafieken() {
   grafiekBd=new Chart(document.getElementById("grafiek-bd"),{
     type:"line",
     data:{ labels,datasets:[
-      { label:"Bovendruk",data:data.map(m=>m.boven),borderColor:"#4a9eff",
-        backgroundColor:"rgba(74,158,255,0.08)",tension:0.3,pointRadius:3,pointBackgroundColor:"#4a9eff" },
-      { label:"Onderdruk",data:data.map(m=>m.onder),borderColor:"#7bcfcf",
-        backgroundColor:"rgba(123,207,207,0.08)",borderDash:[5,3],tension:0.3,pointRadius:3,pointBackgroundColor:"#7bcfcf" }
+      { label:"Bovendruk",data:data.map(m=>m.boven),borderWidth:1.5,borderColor:"#4a9eff",
+        backgroundColor:"rgba(74,158,255,0.08)",tension:0.3,pointRadius:2.5,pointBackgroundColor:"#4a9eff" },
+      { label:"Onderdruk",data:data.map(m=>m.onder),borderWidth:1.5,borderColor:"#7bcfcf",
+        backgroundColor:"rgba(123,207,207,0.08)",borderDash:[5,3],tension:0.3,pointRadius:2.5,pointBackgroundColor:"#7bcfcf" }
     ]},
     options:{ responsive:true,plugins:{legend:{display:true,labels:{color:"#5a7da0",font:{size:12}}},tooltip:tt},scales:sc(50,150) }
   });
