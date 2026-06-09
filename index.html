@@ -441,6 +441,7 @@ const DAGEN_NL   = ["zo","ma","di","wo","do","vr","za"];
 const DAGEN_LANG = ["zondag","maandag","dinsdag","woensdag","donderdag","vrijdag","zaterdag"];
 
 document.getElementById("inp-datum").value = new Date().toISOString().split("T")[0];
+tekenWeek();
 
 function herlaadUI() {
   if (huidigTab==="invoer")    tekenInvoer();
