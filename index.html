@@ -257,8 +257,8 @@
   </div>
   <div id="tab-balk-wrap">
     <div id="tab-balk">
-      <button class="tab-knop actief" onclick="toonTab('invoer')"    id="tab-invoer">Invoer</button>
-      <button class="tab-knop"        onclick="toonTab('week')"      id="tab-week">Week</button>
+      <button class="tab-knop" onclick="toonTab('invoer')"    id="tab-invoer">Invoer</button>
+      <button class="tab-knop actief" onclick="toonTab('week')"      id="tab-week">Week</button>
       <button class="tab-knop"        onclick="toonTab('grafiek')"   id="tab-grafiek">Grafieken</button>
       <button class="tab-knop"        onclick="toonTab('overzicht')" id="tab-overzicht">Overzicht</button>
       <button class="tab-knop"        onclick="toonTab('importeer')" id="tab-importeer">Importeer</button>
@@ -269,7 +269,7 @@
 <div id="content">
 
   <!-- INVOER -->
-  <div id="tab-invoer-inhoud">
+  <div id="tab-invoer-inhoud" style="display:none">
     <div class="kaart">
       <h2 id="invoer-titel">➕ Nieuwe meting</h2>
       <div class="grid-2">
@@ -308,7 +308,7 @@
   </div>
 
   <!-- WEEK -->
-  <div id="tab-week-inhoud" style="display:none">
+  <div id="tab-week-inhoud">
     <div id="week-nav">
       <button class="nav-pijl" onclick="weekStap(-1)">‹</button>
       <div style="text-align:center">
@@ -426,7 +426,7 @@
 
 <script>
 window._metingen = [];
-let huidigTab    = "invoer";
+let huidigTab    = "week";
 let huidigMoment = "ochtend";
 let editId       = null;
 let weekOffset   = 0;
