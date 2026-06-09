@@ -13,9 +13,7 @@
   <script type="module">
     import { initializeApp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
-      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, set, remove, onValue, get, child }
+    import { getDatabase, ref, set, remove, onValue }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     // ── Firebase configuratie ──────────────────────────────────
@@ -30,74 +28,25 @@
     };
     // ──────────────────────────────────────────────────────────
 
-    const app  = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getDatabase(app);
-
-    let currentUser = null;
-
-    // ── AUTH ──────────────────────────────────────────────────
-    window.loginMetGoogle = async () => {
-      try { await signInWithPopup(auth, new GoogleAuthProvider()); }
-      catch(e) { alert("Inloggen mislukt: " + e.message); }
-    };
-    window.uitloggen = () => signOut(auth);
-
-    onAuthStateChanged(auth, user => {
-      currentUser = user;
-      toonLoginStatus(user);
-      if (user) {
-        luisterMetingen(user.uid);
-      } else {
-        window._metingen = [];
-        herlaadUI();
-      }
-    });
-
-    function toonLoginStatus(user) {
-      const el = document.getElementById("login-balk");
-      if (!el) return;
-      if (user) {
-        el.innerHTML = `
-          <span style="color:#7eb8f7;font-size:13px">👤 ${user.displayName || user.email}</span>
-          <button onclick="uitloggen()"
-            style="background:#1e3050;border:1px solid #2a4060;border-radius:8px;
-                   color:#5a7da0;padding:6px 14px;cursor:pointer;font-size:13px;font-family:inherit">
-            Uitloggen
-          </button>`;
-      } else {
-        el.innerHTML = `
-          <button onclick="loginMetGoogle()"
-            style="background:#1a4a7a;border:1px solid #2d6ab0;border-radius:8px;
-                   color:#7eb8f7;padding:6px 14px;cursor:pointer;font-size:13px;font-family:inherit">
-            🔐 Inloggen met Google
-          </button>`;
-      }
-    }
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    const PAD = "metingen";
 
     // ── REALTIME DATABASE ─────────────────────────────────────
-    function metingenPad(uid) {
-      return ref(db, `gebruikers/${uid}/metingen`);
-    }
-
-    function luisterMetingen(uid) {
-      onValue(metingenPad(uid), snap => {
-        const val = snap.val();
-        if (val) {
-          window._metingen = Object.entries(val)
-            .map(([id, m]) => ({ id, ...m }))
-            .sort((a,b) => a.datum.localeCompare(b.datum) || a.moment.localeCompare(b.moment));
-        } else {
-          window._metingen = [];
-        }
-        herlaadUI();
-      });
-    }
+    onValue(ref(db, PAD), snap => {
+      const val = snap.val();
+      if (val) {
+        window._metingen = Object.entries(val)
+          .map(([id, m]) => ({ id, ...m }))
+          .sort((a,b) => a.datum.localeCompare(b.datum) || a.moment.localeCompare(b.moment));
+      } else {
+        window._metingen = [];
+      }
+      herlaadUI();
+    });
 
     window.slaMetingOp = async (meting) => {
-      if (!currentUser) { alert("Log eerst in."); return false; }
-      const pad = ref(db, `gebruikers/${currentUser.uid}/metingen/${meting.id}`);
-      await set(pad, {
+      await set(ref(db, `${PAD}/${meting.id}`), {
         datum:    meting.datum,
         moment:   meting.moment,
         hartslag: meting.hartslag,
@@ -108,19 +57,16 @@
     };
 
     window.verwijderMeting = async (id) => {
-      if (!currentUser) return;
-      await remove(ref(db, `gebruikers/${currentUser.uid}/metingen/${id}`));
+      await remove(ref(db, `${PAD}/${id}`));
     };
 
     window.slaAlleMetingenOp = async (metingen) => {
-      if (!currentUser) { alert("Log eerst in."); return false; }
       for (const m of metingen) await window.slaMetingOp(m);
       return true;
     };
 
     window.verwijderAlleMetingen = async () => {
-      if (!currentUser) return;
-      await remove(ref(db, `gebruikers/${currentUser.uid}/metingen`));
+      await remove(ref(db, PAD));
     };
 
     window._firebaseGereed = true;
@@ -148,10 +94,7 @@
     #header-inner { max-width: 680px; margin: 0 auto; padding: 14px 16px 0; }
     #header h1 { font-size: 20px; color: #e8f2ff; margin: 0 0 2px; }
     #header p  { font-size: 12px; color: #5a7da0; margin: 0 0 10px; }
-    #login-balk {
-      display: flex; align-items: center; justify-content: flex-end;
-      gap: 10px; margin-bottom: 8px;
-    }
+
     #tab-balk-wrap {
       overflow-x: auto; -webkit-overflow-scrolling: touch;
       scrollbar-width: none; max-width: 680px; margin: 0 auto;
@@ -310,13 +253,7 @@
   <div id="header-inner">
     <h1>❤️ Gezondheidslogboek</h1>
     <p>Hartslag &amp; bloeddruk — ochtend &amp; avond</p>
-    <div id="login-balk">
-      <button onclick="loginMetGoogle()"
-        style="background:#1a4a7a;border:1px solid #2d6ab0;border-radius:8px;
-               color:#7eb8f7;padding:6px 14px;cursor:pointer;font-size:13px">
-        🔐 Inloggen met Google
-      </button>
-    </div>
+
   </div>
   <div id="tab-balk-wrap">
     <div id="tab-balk">
